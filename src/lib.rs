@@ -27,32 +27,42 @@ where
     type Item = RangeInclusive<i64>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut last: Option<i64> = None;
+        let mut end: Option<i64> = None;
 
         loop {
             match self.numbers.next() {
                 None => {
-                    if let Some(start) = self.start {
-                        if let Some(last) = last {
-                            return Some(start..=last);
+                    return match self.start {
+                        None => None,
+                        Some(start) => {
+                            self.start = None;
+
+                            match end {
+                                None => Some(start..=start),
+                                Some(end) => Some(start..=end),
+                            }
                         }
                     }
                 }
-                Some(current) => match self.start {
+                Some(next) => match self.start {
                     None => {
-                        self.start = Some(current);
+                        self.start = Some(next);
                     }
-                    Some(_) => match last {
+                    Some(start) => match end {
                         None => {
-                            last = Some(current);
-                        }
-                        Some(l) => {
-                            if current == l + 1 {
-                                last = Some(current);
+                            if next == start + 1 {
+                                end = Some(next);
                             } else {
-                                let range = Some(self.start?..=last?);
-                                self.start = Some(current);
-                                return range;
+                                self.start = Some(next);
+                                return Some(start..=start);
+                            }
+                        }
+                        Some(last) => {
+                            if last + 1 == next {
+                                end = Some(next);
+                            } else {
+                                self.start = Some(next);
+                                return Some(start..=last);
                             }
                         }
                     },
