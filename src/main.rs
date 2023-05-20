@@ -6,14 +6,18 @@ fn main() {
     println!(
         "{}",
         Ranges::from(read_integers())
-            .map(range_to_string)
+            .map(range_to_bash_literal)
             .collect::<Vec<_>>()
             .join(" ")
     )
 }
 
-fn range_to_string(range: RangeInclusive<i64>) -> String {
-    format!("{{{}..{}}}", range.start(), range.end())
+fn range_to_bash_literal(range: RangeInclusive<i64>) -> String {
+    if range.start() == range.end() {
+        range.start().to_string()
+    } else {
+        format!("{{{}..{}}}", range.start(), range.end())
+    }
 }
 
 fn read_integers() -> impl Iterator<Item = i64> {
