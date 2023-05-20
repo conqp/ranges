@@ -1,5 +1,19 @@
 use std::ops::RangeInclusive;
 
+/// Generate ranges from integer sequences
+///
+/// # Examples
+///
+/// ```
+/// use std::ops::RangeInclusive;
+/// use ranges::Ranges;
+///
+/// let sequence: Vec<i64> = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24];
+/// let target: Vec<RangeInclusive<i64>> = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=24];
+///
+/// assert_eq!(Ranges::from(sequence.into_iter()).collect::<Vec<_>>(), target);
+/// ```
+#[derive(Debug)]
 pub struct Ranges<T>
 where
     T: Iterator<Item = i64>,
