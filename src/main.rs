@@ -1,10 +1,19 @@
 use ranges::Ranges;
 use std::io::stdin;
+use std::ops::RangeInclusive;
 
 fn main() {
-    for range in Ranges::from(read_integers()) {
-        println!("{{{}..{}}} ", range.start(), range.end());
-    }
+    println!(
+        "{}",
+        Ranges::from(read_integers())
+            .map(range_to_string)
+            .collect::<Vec<_>>()
+            .join(" ")
+    )
+}
+
+fn range_to_string(range: RangeInclusive<i64>) -> String {
+    format!("{{{}..{}}}", range.start(), range.end())
 }
 
 fn read_integers() -> impl Iterator<Item = i64> {
