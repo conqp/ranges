@@ -61,3 +61,12 @@ where
         }
     }
 }
+
+impl<T> From<T> for Ranges<T>
+where
+    T: Iterator<Item = i64>,
+{
+    fn from(value: T) -> Self {
+        Self::new(value)
+    }
+}

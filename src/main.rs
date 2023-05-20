@@ -2,7 +2,7 @@ use ranges::Ranges;
 use std::io::stdin;
 
 fn main() {
-    for range in Ranges::new(read_integers()) {
+    for range in Ranges::from(read_integers()) {
         print!("{{{}..{}}} ", range.start(), range.end());
     }
 
