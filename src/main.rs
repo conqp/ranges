@@ -12,14 +12,6 @@ fn main() {
     )
 }
 
-fn range_to_bash_literal(range: RangeInclusive<i64>) -> String {
-    if range.start() == range.end() {
-        range.start().to_string()
-    } else {
-        format!("{{{}..{}}}", range.start(), range.end())
-    }
-}
-
 fn read_integers() -> impl Iterator<Item = i64> {
     stdin()
         .lines()
@@ -33,4 +25,12 @@ fn read_integers() -> impl Iterator<Item = i64> {
         .map(|line| line.parse::<i64>())
         .take_while(|result| result.is_ok())
         .map(|result| result.unwrap())
+}
+
+fn range_to_bash_literal(range: RangeInclusive<i64>) -> String {
+    if range.start() == range.end() {
+        range.start().to_string()
+    } else {
+        format!("{{{}..{}}}", range.start(), range.end())
+    }
 }
