@@ -69,45 +69,31 @@ where
                     None => {
                         self.start = Some(next);
                     }
-                    Some(start) => match check_next(start, next, end.unwrap_or(start), order) {
-                        Ok((range, start)) => {
-                            self.start = Some(start);
-                            return Some(range);
+                    Some(start) => match order.clone() {
+                        None => {
+                            if next == end.unwrap_or(start) + 1 {
+                                end = Some(next);
+                                order = Some(Order::Ascending);
+                            } else if next == end.unwrap_or(start) - 1 {
+                                end = Some(next);
+                                order = Some(Order::Descending);
+                            } else {
+                                self.start = Some(next);
+                                return Some(start..=end.unwrap_or(start));
+                            }
                         }
-                        Err((new_end, new_order)) => {
-                            end = Some(new_end);
-                            order = Some(new_order);
+                        Some(order) => {
+                            if (order == Order::Ascending && next == end.unwrap_or(start) + 1)
+                                || (order == Order::Descending && next == end.unwrap_or(start) - 1)
+                            {
+                                end = Some(next)
+                            } else {
+                                self.start = Some(next);
+                                return Some(start..=end.unwrap_or(start));
+                            }
                         }
                     },
                 },
-            }
-        }
-    }
-}
-
-fn check_next(
-    start: i64,
-    next: i64,
-    end: i64,
-    order: Option<Order>,
-) -> Result<(RangeInclusive<i64>, i64), (i64, Order)> {
-    match order {
-        None => {
-            if next == end + 1 {
-                Err((next, Order::Ascending))
-            } else if next == end - 1 {
-                Err((next, Order::Descending))
-            } else {
-                Ok((start..=end, next))
-            }
-        }
-        Some(order) => {
-            if (order == Order::Ascending && next == end + 1)
-                || (order == Order::Descending && next == end - 1)
-            {
-                Err((next, order))
-            } else {
-                Ok((start..=end, next))
             }
         }
     }
