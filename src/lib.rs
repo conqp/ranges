@@ -23,7 +23,7 @@ where
     start: Option<i64>,
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 enum Order {
     Descending,
     Ascending,
@@ -70,7 +70,7 @@ where
                     None => {
                         self.start = Some(next);
                     }
-                    Some(start) => match order.clone() {
+                    Some(start) => match &order {
                         None => {
                             if next == end.unwrap_or(start) + 1 {
                                 end = Some(next);
@@ -84,8 +84,8 @@ where
                             }
                         }
                         Some(order) => {
-                            if (order == Order::Ascending && next == end.unwrap_or(start) + 1)
-                                || (order == Order::Descending && next == end.unwrap_or(start) - 1)
+                            if (order == &Order::Ascending && next == end.unwrap_or(start) + 1)
+                                || (order == &Order::Descending && next == end.unwrap_or(start) - 1)
                             {
                                 end = Some(next)
                             } else {
