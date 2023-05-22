@@ -1,4 +1,4 @@
-use std::ops::RangeInclusive;
+use std::ops::{Add, RangeInclusive, Sub};
 
 /// Generate ranges from integer sequences
 ///
@@ -15,12 +15,18 @@ use std::ops::RangeInclusive;
 /// assert_eq!(ranges, target);
 /// ```
 #[derive(Debug)]
-pub struct Ranges<T>
+pub struct Ranges<T, I>
 where
-    T: Iterator<Item = i64>,
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    I: Iterator<Item = T>,
 {
-    numbers: T,
-    start: Option<i64>,
+    numbers: I,
+    start: Option<T>,
 }
 
 #[derive(Eq, PartialEq)]
@@ -29,11 +35,17 @@ enum Order {
     Descending,
 }
 
-impl<T> Ranges<T>
+impl<T, I> Ranges<T, I>
 where
-    T: Iterator<Item = i64>,
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    I: Iterator<Item = T>,
 {
-    pub fn new(numbers: T) -> Self {
+    pub fn new(numbers: I) -> Self {
         Self {
             numbers,
             start: None,
@@ -41,15 +53,21 @@ where
     }
 }
 
-impl<T> Iterator for Ranges<T>
+impl<T, I> Iterator for Ranges<T, I>
 where
-    T: Iterator<Item = i64>,
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    I: Iterator<Item = T>,
 {
-    type Item = RangeInclusive<i64>;
+    type Item = RangeInclusive<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut order: Option<Order> = None;
-        let mut end: Option<i64> = None;
+        let mut end: Option<T> = None;
 
         loop {
             match self.numbers.next() {
@@ -72,10 +90,10 @@ where
                     }
                     Some(start) => match &order {
                         None => {
-                            if next == end.unwrap_or(start) + 1 {
+                            if next == end.unwrap_or(start) + 1.into() {
                                 end = Some(next);
                                 order = Some(Order::Ascending);
-                            } else if next == end.unwrap_or(start) - 1 {
+                            } else if next == end.unwrap_or(start) - 1.into() {
                                 end = Some(next);
                                 order = Some(Order::Descending);
                             } else {
@@ -84,8 +102,10 @@ where
                             }
                         }
                         Some(order) => {
-                            if (order == &Order::Ascending && next == end.unwrap_or(start) + 1)
-                                || (order == &Order::Descending && next == end.unwrap_or(start) - 1)
+                            if (order == &Order::Ascending
+                                && next == end.unwrap_or(start) + 1.into())
+                                || (order == &Order::Descending
+                                    && next == end.unwrap_or(start) - 1.into())
                             {
                                 end = Some(next)
                             } else {
@@ -100,11 +120,17 @@ where
     }
 }
 
-impl<T> From<T> for Ranges<T>
+impl<T, I> From<I> for Ranges<T, I>
 where
-    T: Iterator<Item = i64>,
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    I: Iterator<Item = T>,
 {
-    fn from(value: T) -> Self {
+    fn from(value: I) -> Self {
         Self::new(value)
     }
 }
