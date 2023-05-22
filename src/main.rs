@@ -22,7 +22,7 @@ fn read_integers() -> impl Iterator<Item = i64> {
                 .map(str::to_owned)
                 .collect::<Vec<_>>()
         })
-        .map(|line| line.parse::<i64>())
+        .map(|number| number.parse::<i64>())
         .take_while(|result| result.is_ok())
         .map(|result| result.unwrap())
 }
