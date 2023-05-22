@@ -5,7 +5,8 @@ use std::ops::RangeInclusive;
 fn main() {
     println!(
         "{}",
-        Ranges::from(read_integers())
+        read_integers()
+            .ranges()
             .map(range_to_bash_literal)
             .collect::<Vec<_>>()
             .join(" ")

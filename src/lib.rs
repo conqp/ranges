@@ -6,16 +6,44 @@ use std::ops::{Add, RangeInclusive, Sub};
 ///
 /// ```
 /// use std::ops::RangeInclusive;
-/// use ranges::Ranges;
+/// use ranges::RangesIterator;
 ///
 /// let sequence: Vec<i64> = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
 /// let target: Vec<RangeInclusive<i64>> = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22];
-/// let ranges: Vec<RangeInclusive<i64>> = Ranges::from(sequence.into_iter()).collect();
+/// let ranges: Vec<RangeInclusive<i64>> = RangesIterator::from(sequence.into_iter()).collect();
 ///
 /// assert_eq!(ranges, target);
 /// ```
+pub trait Ranges<T>
+where
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    Self: Iterator<Item = T> + Sized,
+{
+    fn ranges(self) -> RangesIterator<T, Self>;
+}
+
+impl<T, I> Ranges<T> for I
+where
+    T: Add<T, Output = T>
+        + Sub<T, Output = T>
+        + PartialEq<<T as Add>::Output>
+        + PartialEq<<T as Sub>::Output>
+        + From<u8>
+        + Copy,
+    I: Iterator<Item = T>,
+{
+    fn ranges(self) -> RangesIterator<T, Self> {
+        RangesIterator::from(self)
+    }
+}
+
 #[derive(Debug)]
-pub struct Ranges<T, I>
+pub struct RangesIterator<T, I>
 where
     T: Add<T, Output = T>
         + Sub<T, Output = T>
@@ -35,7 +63,7 @@ enum Order {
     Descending,
 }
 
-impl<T, I> Ranges<T, I>
+impl<T, I> RangesIterator<T, I>
 where
     T: Add<T, Output = T>
         + Sub<T, Output = T>
@@ -53,7 +81,7 @@ where
     }
 }
 
-impl<T, I> Iterator for Ranges<T, I>
+impl<T, I> Iterator for RangesIterator<T, I>
 where
     T: Add<T, Output = T>
         + Sub<T, Output = T>
@@ -120,7 +148,7 @@ where
     }
 }
 
-impl<T, I> From<I> for Ranges<T, I>
+impl<T, I> From<I> for RangesIterator<T, I>
 where
     T: Add<T, Output = T>
         + Sub<T, Output = T>
