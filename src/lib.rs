@@ -70,56 +70,56 @@ where
                         self.start = Some(next);
                     }
                     Some(start) => match end {
-                        None => match order.clone() {
-                            None => {
-                                if next == start + 1 {
-                                    order = Some(Order::Ascending);
-                                    end = Some(next);
-                                } else if next == start - 1 {
-                                    order = Some(Order::Descending);
-                                    end = Some(next);
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(start..=start);
-                                }
+                        None => match check_next(start, next, start, order) {
+                            Ok((range, start)) => {
+                                self.start = Some(start);
+                                return Some(range);
                             }
-                            Some(order) => {
-                                if (order == Order::Ascending && next == start + 1)
-                                    || (order == Order::Descending && next == start - 1)
-                                {
-                                    end = Some(next);
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(start..=start);
-                                }
+                            Err((new_end, new_order)) => {
+                                end = Some(new_end);
+                                order = Some(new_order);
                             }
                         },
-                        Some(last) => match order.clone() {
-                            None => {
-                                if next == last + 1 {
-                                    order = Some(Order::Ascending);
-                                    end = Some(next);
-                                } else if next == last - 1 {
-                                    order = Some(Order::Descending);
-                                    end = Some(next);
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(start..=last);
-                                }
+                        Some(last) => match check_next(start, next, last, order) {
+                            Ok((range, start)) => {
+                                self.start = Some(start);
+                                return Some(range);
                             }
-                            Some(order) => {
-                                if (order == Order::Ascending && next == last + 1)
-                                    || (order == Order::Descending && next == last - 1)
-                                {
-                                    end = Some(next);
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(start..=last);
-                                }
+                            Err((new_end, new_order)) => {
+                                end = Some(new_end);
+                                order = Some(new_order);
                             }
                         },
                     },
                 },
+            }
+        }
+    }
+}
+
+fn check_next(
+    start: i64,
+    next: i64,
+    end: i64,
+    order: Option<Order>,
+) -> Result<(RangeInclusive<i64>, i64), (i64, Order)> {
+    match order {
+        None => {
+            if next == end + 1 {
+                Err((next, Order::Ascending))
+            } else if next == end - 1 {
+                Err((next, Order::Descending))
+            } else {
+                Ok((start..=end, next))
+            }
+        }
+        Some(order) => {
+            if (order == Order::Ascending && next == end + 1)
+                || (order == Order::Descending && next == end - 1)
+            {
+                Err((next, order))
+            } else {
+                Ok((start..=end, next))
             }
         }
     }
