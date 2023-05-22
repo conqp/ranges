@@ -25,8 +25,8 @@ where
 
 #[derive(Eq, PartialEq)]
 enum Order {
-    Descending,
     Ascending,
+    Descending,
 }
 
 impl<T> Ranges<T>
