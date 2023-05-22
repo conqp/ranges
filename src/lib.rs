@@ -69,27 +69,15 @@ where
                     None => {
                         self.start = Some(next);
                     }
-                    Some(start) => match end {
-                        None => match check_next(start, next, start, order) {
-                            Ok((range, start)) => {
-                                self.start = Some(start);
-                                return Some(range);
-                            }
-                            Err((new_end, new_order)) => {
-                                end = Some(new_end);
-                                order = Some(new_order);
-                            }
-                        },
-                        Some(last) => match check_next(start, next, last, order) {
-                            Ok((range, start)) => {
-                                self.start = Some(start);
-                                return Some(range);
-                            }
-                            Err((new_end, new_order)) => {
-                                end = Some(new_end);
-                                order = Some(new_order);
-                            }
-                        },
+                    Some(start) => match check_next(start, next, end.unwrap_or(start), order) {
+                        Ok((range, start)) => {
+                            self.start = Some(start);
+                            return Some(range);
+                        }
+                        Err((new_end, new_order)) => {
+                            end = Some(new_end);
+                            order = Some(new_order);
+                        }
                     },
                 },
             }
