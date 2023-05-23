@@ -40,6 +40,7 @@ where
 {
     numbers: I,
     start: Option<T>,
+    one: T,
 }
 
 #[derive(Eq, PartialEq)]
@@ -57,6 +58,7 @@ where
         Self {
             numbers,
             start: None,
+            one: 1.into(),
         }
     }
 }
@@ -96,10 +98,10 @@ where
 
                         match &order {
                             None => {
-                                if next == last + 1.into() {
+                                if next == last + self.one {
                                     end = Some(next);
                                     order = Some(Order::Ascending);
-                                } else if next == last - 1.into() {
+                                } else if next == last - self.one {
                                     end = Some(next);
                                     order = Some(Order::Descending);
                                 } else {
@@ -108,8 +110,8 @@ where
                                 }
                             }
                             Some(order) => {
-                                if (order == &Order::Ascending && next == last + 1.into())
-                                    || (order == &Order::Descending && next == last - 1.into())
+                                if (order == &Order::Ascending && next == last + self.one)
+                                    || (order == &Order::Descending && next == last - self.one)
                                 {
                                     end = Some(next)
                                 } else {
