@@ -91,32 +91,34 @@ where
                     None => {
                         self.start = Some(next);
                     }
-                    Some(start) => match &order {
-                        None => {
-                            if next == end.unwrap_or(start) + 1.into() {
-                                end = Some(next);
-                                order = Some(Order::Ascending);
-                            } else if next == end.unwrap_or(start) - 1.into() {
-                                end = Some(next);
-                                order = Some(Order::Descending);
-                            } else {
-                                self.start = Some(next);
-                                return Some(start..=end.unwrap_or(start));
+                    Some(start) => {
+                        let last = end.unwrap_or(start);
+
+                        match &order {
+                            None => {
+                                if next == last + 1.into() {
+                                    end = Some(next);
+                                    order = Some(Order::Ascending);
+                                } else if next == last - 1.into() {
+                                    end = Some(next);
+                                    order = Some(Order::Descending);
+                                } else {
+                                    self.start = Some(next);
+                                    return Some(start..=last);
+                                }
+                            }
+                            Some(order) => {
+                                if (order == &Order::Ascending && next == last + 1.into())
+                                    || (order == &Order::Descending && next == last - 1.into())
+                                {
+                                    end = Some(next)
+                                } else {
+                                    self.start = Some(next);
+                                    return Some(start..=last);
+                                }
                             }
                         }
-                        Some(order) => {
-                            if (order == &Order::Ascending
-                                && next == end.unwrap_or(start) + 1.into())
-                                || (order == &Order::Descending
-                                    && next == end.unwrap_or(start) - 1.into())
-                            {
-                                end = Some(next)
-                            } else {
-                                self.start = Some(next);
-                                return Some(start..=end.unwrap_or(start));
-                            }
-                        }
-                    },
+                    }
                 },
             }
         }
