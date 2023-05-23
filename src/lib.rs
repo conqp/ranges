@@ -16,12 +16,7 @@ use std::ops::{Add, RangeInclusive, Sub};
 /// ```
 pub trait Ranges<T>
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     Self: Iterator<Item = T> + Sized,
 {
     fn ranges(self) -> RangesIterator<T, Self>;
@@ -29,12 +24,7 @@ where
 
 impl<T, I> Ranges<T> for I
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
     fn ranges(self) -> RangesIterator<T, Self> {
@@ -45,12 +35,7 @@ where
 #[derive(Debug)]
 pub struct RangesIterator<T, I>
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
     numbers: I,
@@ -65,12 +50,7 @@ enum Order {
 
 impl<T, I> RangesIterator<T, I>
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
     pub fn new(numbers: I) -> Self {
@@ -83,12 +63,7 @@ where
 
 impl<T, I> Iterator for RangesIterator<T, I>
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
     type Item = RangeInclusive<T>;
@@ -150,12 +125,7 @@ where
 
 impl<T, I> From<I> for RangesIterator<T, I>
 where
-    T: Add<T, Output = T>
-        + Sub<T, Output = T>
-        + PartialEq<<T as Add>::Output>
-        + PartialEq<<T as Sub>::Output>
-        + From<u8>
-        + Copy,
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
     fn from(value: I) -> Self {
