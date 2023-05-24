@@ -6,29 +6,30 @@ use std::ops::{Add, RangeInclusive, Sub};
 ///
 /// ```
 /// use std::ops::RangeInclusive;
-/// use ranges::RangesIterator;
+/// use ranges::Ranges;
 ///
 /// let sequence: Vec<i64> = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
 /// let target: Vec<RangeInclusive<i64>> = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22];
-/// let ranges: Vec<RangeInclusive<i64>> = RangesIterator::from(sequence.into_iter()).collect();
+/// let ranges: Vec<RangeInclusive<i64>> = sequence.ranges().collect();
 ///
 /// assert_eq!(ranges, target);
 /// ```
-pub trait Ranges<T>
-where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    Self: Iterator<Item = T> + Sized,
-{
-    fn ranges(self) -> RangesIterator<T, Self>;
-}
-
-impl<T, I> Ranges<T> for I
+pub trait Ranges<T, I>
 where
     T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
     I: Iterator<Item = T>,
 {
-    fn ranges(self) -> RangesIterator<T, Self> {
-        RangesIterator::from(self)
+    fn ranges(self) -> RangesIterator<T, I>;
+}
+
+impl<T, II, I> Ranges<T, I> for II
+where
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
+    II: IntoIterator<Item = T, IntoIter = I>,
+    I: Iterator<Item = T>,
+{
+    fn ranges(self) -> RangesIterator<T, I> {
+        RangesIterator::new(self.into_iter())
     }
 }
 
@@ -124,15 +125,5 @@ where
                 },
             }
         }
-    }
-}
-
-impl<T, I> From<I> for RangesIterator<T, I>
-where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
-{
-    fn from(value: I) -> Self {
-        Self::new(value)
     }
 }
