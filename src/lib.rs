@@ -22,14 +22,13 @@ where
     fn ranges(self) -> RangesIterator<T, I>;
 }
 
-impl<T, II, I> Ranges<T, I> for II
+impl<T, I> Ranges<T, I::IntoIter> for I
 where
     T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    II: IntoIterator<Item = T, IntoIter = I>,
-    I: Iterator<Item = T>,
+    I: IntoIterator<Item = T>,
 {
-    fn ranges(self) -> RangesIterator<T, I> {
-        RangesIterator::new(self.into_iter())
+    fn ranges(self) -> RangesIterator<T, I::IntoIter> {
+        self.into_iter().into()
     }
 }
 
@@ -125,5 +124,15 @@ where
                 },
             }
         }
+    }
+}
+
+impl<T, I> From<I> for RangesIterator<T, I>
+where
+    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
+    I: Iterator<Item = T>,
+{
+    fn from(value: I) -> Self {
+        Self::new(value)
     }
 }
