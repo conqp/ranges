@@ -8,9 +8,9 @@ use std::ops::{Add, RangeInclusive, Sub};
 /// use std::ops::RangeInclusive;
 /// use ranges::Ranges;
 ///
-/// let sequence: Vec<i64> = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
-/// let target: Vec<RangeInclusive<i64>> = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22];
-/// let ranges: Vec<RangeInclusive<i64>> = sequence.ranges().collect();
+/// let sequence = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
+/// let target = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22];
+/// let ranges: Vec<_> = sequence.ranges().collect();
 ///
 /// assert_eq!(ranges, target);
 /// ```
