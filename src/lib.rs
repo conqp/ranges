@@ -64,11 +64,7 @@ where
 impl<T> Iterator for RangesIterator<T>
 where
     T: Iterator,
-    T::Item: Add<T::Item, Output = T::Item>
-        + Sub<T::Item, Output = T::Item>
-        + PartialEq
-        + From<u8>
-        + Copy,
+    T::Item: Add<T::Item, Output = T::Item> + Sub<T::Item, Output = T::Item> + PartialEq + Copy,
 {
     type Item = RangeInclusive<T::Item>;
 
