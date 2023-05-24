@@ -14,31 +14,31 @@ use std::ops::{Add, RangeInclusive, Sub};
 ///
 /// assert_eq!(ranges, target);
 /// ```
-pub trait Ranges<I>
+pub trait Ranges<T>
 where
-    I: Iterator,
+    T: Iterator,
 {
-    fn ranges(self) -> RangesIterator<I>;
+    fn ranges(self) -> RangesIterator<T>;
 }
 
-impl<I> Ranges<I::IntoIter> for I
+impl<T> Ranges<T::IntoIter> for T
 where
-    I: IntoIterator,
-    I::Item: From<u8>,
+    T: IntoIterator,
+    T::Item: From<u8>,
 {
-    fn ranges(self) -> RangesIterator<I::IntoIter> {
+    fn ranges(self) -> RangesIterator<T::IntoIter> {
         self.into_iter().into()
     }
 }
 
 #[derive(Debug)]
-pub struct RangesIterator<I>
+pub struct RangesIterator<T>
 where
-    I: Iterator,
+    T: Iterator,
 {
-    numbers: I,
-    start: Option<I::Item>,
-    one: I::Item,
+    numbers: T,
+    start: Option<T::Item>,
+    one: T::Item,
 }
 
 #[derive(Eq, PartialEq)]
@@ -47,12 +47,12 @@ enum Order {
     Descending,
 }
 
-impl<I> RangesIterator<I>
+impl<T> RangesIterator<T>
 where
-    I: Iterator,
-    I::Item: From<u8>,
+    T: Iterator,
+    T::Item: From<u8>,
 {
-    pub fn new(numbers: I) -> Self {
+    pub fn new(numbers: T) -> Self {
         Self {
             numbers,
             start: None,
@@ -61,20 +61,20 @@ where
     }
 }
 
-impl<I> Iterator for RangesIterator<I>
+impl<T> Iterator for RangesIterator<T>
 where
-    I: Iterator,
-    I::Item: Add<I::Item, Output = I::Item>
-        + Sub<I::Item, Output = I::Item>
+    T: Iterator,
+    T::Item: Add<T::Item, Output = T::Item>
+        + Sub<T::Item, Output = T::Item>
         + PartialEq
         + From<u8>
         + Copy,
 {
-    type Item = RangeInclusive<I::Item>;
+    type Item = RangeInclusive<T::Item>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut order: Option<Order> = None;
-        let mut end: Option<I::Item> = None;
+        let mut end: Option<T::Item> = None;
 
         loop {
             match self.numbers.next() {
@@ -129,12 +129,12 @@ where
     }
 }
 
-impl<I> From<I> for RangesIterator<I>
+impl<T> From<T> for RangesIterator<T>
 where
-    I: Iterator,
-    I::Item: From<u8>,
+    T: Iterator,
+    T::Item: From<u8>,
 {
-    fn from(value: I) -> Self {
+    fn from(value: T) -> Self {
         Self::new(value)
     }
 }
