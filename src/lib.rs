@@ -14,33 +14,31 @@ use std::ops::{Add, RangeInclusive, Sub};
 ///
 /// assert_eq!(ranges, target);
 /// ```
-pub trait Ranges<T, I>
+pub trait Ranges<I>
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
+    I: Iterator,
 {
-    fn ranges(self) -> RangesIterator<T, I>;
+    fn ranges(self) -> RangesIterator<I>;
 }
 
-impl<T, I> Ranges<T, I::IntoIter> for I
+impl<I> Ranges<I::IntoIter> for I
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: IntoIterator<Item = T>,
+    I: IntoIterator,
+    I::Item: From<u8>,
 {
-    fn ranges(self) -> RangesIterator<T, I::IntoIter> {
+    fn ranges(self) -> RangesIterator<I::IntoIter> {
         self.into_iter().into()
     }
 }
 
 #[derive(Debug)]
-pub struct RangesIterator<T, I>
+pub struct RangesIterator<I>
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
+    I: Iterator,
 {
     numbers: I,
-    start: Option<T>,
-    one: T,
+    start: Option<I::Item>,
+    one: I::Item,
 }
 
 #[derive(Eq, PartialEq)]
@@ -49,10 +47,10 @@ enum Order {
     Descending,
 }
 
-impl<T, I> RangesIterator<T, I>
+impl<I> RangesIterator<I>
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
+    I: Iterator,
+    I::Item: From<u8>,
 {
     pub fn new(numbers: I) -> Self {
         Self {
@@ -63,16 +61,20 @@ where
     }
 }
 
-impl<T, I> Iterator for RangesIterator<T, I>
+impl<I> Iterator for RangesIterator<I>
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
+    I: Iterator,
+    I::Item: Add<I::Item, Output = I::Item>
+        + Sub<I::Item, Output = I::Item>
+        + PartialEq
+        + From<u8>
+        + Copy,
 {
-    type Item = RangeInclusive<T>;
+    type Item = RangeInclusive<I::Item>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut order: Option<Order> = None;
-        let mut end: Option<T> = None;
+        let mut end: Option<I::Item> = None;
 
         loop {
             match self.numbers.next() {
@@ -127,10 +129,10 @@ where
     }
 }
 
-impl<T, I> From<I> for RangesIterator<T, I>
+impl<I> From<I> for RangesIterator<I>
 where
-    T: Add<T, Output = T> + Sub<T, Output = T> + PartialEq + From<u8> + Copy,
-    I: Iterator<Item = T>,
+    I: Iterator,
+    I::Item: From<u8>,
 {
     fn from(value: I) -> Self {
         Self::new(value)
