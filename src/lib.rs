@@ -1,4 +1,6 @@
+use either::{Either, Left, Right};
 use std::fmt::{Display, Error, Formatter};
+use std::iter::Rev;
 use std::ops::{Add, RangeInclusive, Sub};
 
 /// Generate ranges from integer sequences
@@ -54,17 +56,17 @@ where
 
 impl<T> IntoIterator for Range<T>
 where
-    T: Display + PartialOrd + 'static,
+    T: Display + PartialOrd,
     RangeInclusive<T>: Iterator<Item = T> + DoubleEndedIterator,
 {
     type Item = T;
-    type IntoIter = Box<dyn Iterator<Item = T>>;
+    type IntoIter = Either<RangeInclusive<T>, Rev<RangeInclusive<T>>>;
 
     fn into_iter(self) -> Self::IntoIter {
         if self.start > self.end {
-            Box::new((self.end..=self.start).rev())
+            Right((self.end..=self.start).rev())
         } else {
-            Box::new(self.start..=self.end)
+            Left(self.start..=self.end)
         }
     }
 }
