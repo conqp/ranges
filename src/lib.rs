@@ -1,5 +1,4 @@
 use std::fmt::{Display, Error, Formatter};
-use std::iter::Rev;
 use std::ops::{Add, RangeInclusive, Sub};
 
 /// Generate ranges from integer sequences
@@ -57,7 +56,6 @@ impl<T> IntoIterator for Range<T>
 where
     T: Display + PartialOrd + 'static,
     RangeInclusive<T>: Iterator<Item = T> + DoubleEndedIterator,
-    Rev<RangeInclusive<T>>: Iterator<Item = T>,
 {
     type Item = T;
     type IntoIter = Box<dyn Iterator<Item = T>>;
