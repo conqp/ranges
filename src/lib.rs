@@ -1,7 +1,7 @@
 use either::{Either, Left, Right};
 use std::fmt::{Display, Error, Formatter};
 use std::iter::Rev;
-use std::ops::{Add, RangeInclusive, Sub};
+use std::ops::{Add, Range as OpsRange, RangeInclusive, Sub};
 
 /// Generate ranges from integer sequences
 ///
@@ -12,9 +12,9 @@ use std::ops::{Add, RangeInclusive, Sub};
 /// use ranges::{Range, Ranges};
 ///
 /// let sequence = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
-/// let target = [1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22].map(
-///     |range| Range::new(*range.start(), *range.end())
-/// ).into_iter().collect::<Vec<_>>();
+/// let target: Vec<Range<_>> = vec![1..=3, 6..=7, 9..=9, 9..=9, 9..=9, 11..=11, 20..=22, 24..=22].into_iter().map(
+///     |range| range.into()
+/// ).collect();
 /// let ranges: Vec<_> = sequence.ranges().collect();
 ///
 /// assert_eq!(ranges, target);
@@ -29,7 +29,7 @@ where
 impl<T> Ranges<T::IntoIter> for T
 where
     T: IntoIterator,
-    T::Item: From<bool>,
+    T::Item: From<u8>,
 {
     fn ranges(self) -> RangesIterator<T::IntoIter> {
         self.into_iter().into()
@@ -96,6 +96,24 @@ where
     }
 }
 
+impl<T> From<RangeInclusive<T>> for Range<T>
+where
+    T: Clone + Display + PartialEq,
+{
+    fn from(value: RangeInclusive<T>) -> Self {
+        Self::new(value.start().clone(), value.end().clone())
+    }
+}
+
+impl<T> From<OpsRange<T>> for Range<T>
+where
+    T: Add<T, Output = T> + Clone + Display + From<u8> + PartialEq,
+{
+    fn from(value: OpsRange<T>) -> Self {
+        Self::new(value.start, value.end + 1.into())
+    }
+}
+
 #[derive(Debug, Eq, PartialEq)]
 enum Order {
     Ascending,
@@ -105,11 +123,11 @@ enum Order {
 impl Order {
     pub fn new<T>(start: T, next: T) -> Option<Self>
     where
-        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<bool>,
+        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<u8>,
     {
-        if next == start + true.into() {
+        if next == start + 1.into() {
             Some(Self::Ascending)
-        } else if next == start - true.into() {
+        } else if next == start - 1.into() {
             Some(Self::Descending)
         } else {
             None
@@ -146,7 +164,7 @@ where
         + Display
         + Sub<T::Item, Output = T::Item>
         + PartialEq
-        + From<bool>,
+        + From<u8>,
 {
     type Item = Range<T::Item>;
 
@@ -204,7 +222,7 @@ where
 impl<T> From<T> for RangesIterator<T>
 where
     T: Iterator,
-    T::Item: From<bool>,
+    T::Item: From<u8>,
 {
     fn from(value: T) -> Self {
         Self::new(value)
