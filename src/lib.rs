@@ -1,4 +1,5 @@
 use std::fmt::{Display, Error, Formatter};
+use std::iter::Rev;
 use std::ops::{Add, RangeInclusive, Sub};
 
 /// Generate ranges from integer sequences
@@ -27,7 +28,7 @@ where
 impl<T> Ranges<T::IntoIter> for T
 where
     T: IntoIterator,
-    T::Item: From<u8>,
+    T::Item: From<bool>,
 {
     fn ranges(self) -> RangesIterator<T::IntoIter> {
         self.into_iter().into()
@@ -54,17 +55,18 @@ where
 
 impl<T> IntoIterator for Range<T>
 where
-    T: Display + PartialOrd,
-    RangeInclusive<T>: Iterator<Item = T>,
+    T: Display + PartialOrd + 'static,
+    RangeInclusive<T>: Iterator<Item = T> + DoubleEndedIterator,
+    Rev<RangeInclusive<T>>: Iterator<Item = T>,
 {
     type Item = T;
-    type IntoIter = RangeInclusive<T>;
+    type IntoIter = Box<dyn Iterator<Item = T>>;
 
     fn into_iter(self) -> Self::IntoIter {
         if self.start > self.end {
-            self.end..=self.start
+            Box::new((self.end..=self.start).rev())
         } else {
-            self.start..=self.end
+            Box::new(self.start..=self.end)
         }
     }
 }
@@ -91,11 +93,11 @@ enum Order {
 impl Order {
     pub fn new<T>(start: T, next: T) -> Option<Self>
     where
-        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<u8>,
+        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<bool>,
     {
-        if next == start + 1.into() {
+        if next == start + true.into() {
             Some(Self::Ascending)
-        } else if next == start - 1.into() {
+        } else if next == start - true.into() {
             Some(Self::Descending)
         } else {
             None
@@ -132,7 +134,7 @@ where
         + Display
         + Sub<T::Item, Output = T::Item>
         + PartialEq
-        + From<u8>,
+        + From<bool>,
 {
     type Item = Range<T::Item>;
 
@@ -190,7 +192,7 @@ where
 impl<T> From<T> for RangesIterator<T>
 where
     T: Iterator,
-    T::Item: From<u8>,
+    T::Item: From<bool>,
 {
     fn from(value: T) -> Self {
         Self::new(value)
