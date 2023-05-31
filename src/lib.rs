@@ -127,56 +127,52 @@ where
         let mut order: Option<Order> = None;
         let mut end: Option<T::Item> = None;
 
-        loop {
-            match self.numbers.next() {
+        for next in &mut self.numbers {
+            match self.start {
                 None => {
-                    return match self.start {
-                        None => None,
-                        Some(start) => {
-                            self.start = None;
+                    self.start = Some(next);
+                }
+                Some(start) => {
+                    let last = end.unwrap_or(start);
 
-                            match end {
-                                None => Some(Range::new(start, start)),
-                                Some(end) => Some(Range::new(start, end)),
+                    match &order {
+                        None => {
+                            if next == last + self.one {
+                                end = Some(next);
+                                order = Some(Order::Ascending);
+                            } else if next == last - self.one {
+                                end = Some(next);
+                                order = Some(Order::Descending);
+                            } else {
+                                self.start = Some(next);
+                                return Some(Range::new(start, last));
+                            }
+                        }
+                        Some(order) => {
+                            if (order == &Order::Ascending && next == last + self.one)
+                                || (order == &Order::Descending && next == last - self.one)
+                            {
+                                end = Some(next)
+                            } else {
+                                self.start = Some(next);
+                                return Some(Range::new(start, last));
                             }
                         }
                     }
                 }
-                Some(next) => match self.start {
-                    None => {
-                        self.start = Some(next);
-                    }
-                    Some(start) => {
-                        let last = end.unwrap_or(start);
-
-                        match &order {
-                            None => {
-                                if next == last + self.one {
-                                    end = Some(next);
-                                    order = Some(Order::Ascending);
-                                } else if next == last - self.one {
-                                    end = Some(next);
-                                    order = Some(Order::Descending);
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(Range::new(start, last));
-                                }
-                            }
-                            Some(order) => {
-                                if (order == &Order::Ascending && next == last + self.one)
-                                    || (order == &Order::Descending && next == last - self.one)
-                                {
-                                    end = Some(next)
-                                } else {
-                                    self.start = Some(next);
-                                    return Some(Range::new(start, last));
-                                }
-                            }
-                        }
-                    }
-                },
             }
         }
+
+        if let Some(start) = self.start {
+            self.start = None;
+
+            return match end {
+                None => Some(Range::new(start, start)),
+                Some(end) => Some(Range::new(start, end)),
+            };
+        }
+
+        None
     }
 }
 
