@@ -159,9 +159,9 @@ where
                                 return Some(Range::new(start, last));
                             }
                         },
-                        Some(current_order) => {
-                            if let Some(new_order) = Order::new(last, next) {
-                                if &new_order == current_order {
+                        Some(order) => {
+                            if let Some(new_order) = &Order::new(last, next) {
+                                if new_order == order {
                                     end = Some(next);
                                     continue;
                                 }
