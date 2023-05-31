@@ -1,18 +1,16 @@
 use ranges::Ranges;
-use std::fmt::{Debug, Display};
-use std::io::stdin;
-use std::ops::RangeInclusive;
+use std::fmt::Debug;
+use std::io::{stdin, stdout, BufWriter, Write};
 use std::str::FromStr;
 
 fn main() {
-    println!(
-        "{}",
-        read_integers::<i64>()
-            .ranges()
-            .map(range_to_bash_literal)
-            .collect::<Vec<_>>()
-            .join(" ")
-    )
+    let mut stdout = BufWriter::new(stdout().lock());
+    let mut separator = "";
+
+    read_integers::<i64>().ranges().for_each(|range| {
+        write!(stdout, "{separator}{range}").expect("Could not write to STDOUT.");
+        separator = " ";
+    })
 }
 
 fn read_integers<T>() -> impl Iterator<Item = T>
@@ -32,15 +30,4 @@ where
         .map(|number| number.parse::<T>())
         .take_while(|result| result.is_ok())
         .map(|result| result.unwrap())
-}
-
-fn range_to_bash_literal<T>(range: RangeInclusive<T>) -> String
-where
-    T: Display + PartialEq,
-{
-    if range.start() == range.end() {
-        range.start().to_string()
-    } else {
-        format!("{{{}..{}}}", range.start(), range.end())
-    }
 }
