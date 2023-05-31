@@ -65,16 +65,16 @@ where
 
 impl<T> From<RangeInclusive<T>> for Range<T>
 where
-    T: Clone + Display + PartialEq,
+    T: Copy + Display + PartialEq,
 {
     fn from(value: RangeInclusive<T>) -> Self {
-        Self::new(value.start().clone(), value.end().clone())
+        Self::new(*value.start(), *value.end())
     }
 }
 
 impl<T> From<OpsRange<T>> for Range<T>
 where
-    T: Add<T, Output = T> + Clone + Display + From<u8> + PartialEq,
+    T: Add<T, Output = T> + Display + From<u8> + PartialEq,
 {
     fn from(value: OpsRange<T>) -> Self {
         Self::new(value.start, value.end + 1.into())
