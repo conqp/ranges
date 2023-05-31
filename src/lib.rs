@@ -27,7 +27,7 @@ where
 impl<T> Ranges<T::IntoIter> for T
 where
     T: IntoIterator,
-    T::Item: From<i8>,
+    T::Item: From<u8>,
 {
     fn ranges(self) -> RangesIterator<T::IntoIter> {
         self.into_iter().into()
@@ -91,7 +91,7 @@ enum Order {
 impl Order {
     pub fn new<T>(start: T, next: T) -> Option<Self>
     where
-        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<i8>,
+        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<u8>,
     {
         if next == start + 1.into() {
             Some(Self::Ascending)
@@ -132,7 +132,7 @@ where
         + Display
         + Sub<T::Item, Output = T::Item>
         + PartialEq
-        + From<i8>,
+        + From<u8>,
 {
     type Item = Range<T::Item>;
 
@@ -190,7 +190,7 @@ where
 impl<T> From<T> for RangesIterator<T>
 where
     T: Iterator,
-    T::Item: From<i8>,
+    T::Item: From<u8>,
 {
     fn from(value: T) -> Self {
         Self::new(value)
