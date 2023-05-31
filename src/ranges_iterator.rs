@@ -33,8 +33,8 @@ where
         + Copy
         + Display
         + From<u8>
-        + Sub<T::Item, Output = T::Item>
-        + PartialEq,
+        + PartialEq
+        + Sub<T::Item, Output = T::Item>,
 {
     type Item = Range<T::Item>;
 

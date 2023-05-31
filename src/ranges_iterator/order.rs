@@ -9,7 +9,7 @@ pub(crate) enum Order {
 impl Order {
     pub fn new<T>(start: T, next: T) -> Option<Self>
     where
-        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<u8>,
+        T: Add<T, Output = T> + Copy + From<u8> + PartialEq + Sub<T, Output = T>,
     {
         if next == start + 1.into() {
             Some(Self::Ascending)
