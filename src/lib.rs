@@ -1,4 +1,3 @@
-mod order;
 mod range;
 mod ranges;
 mod ranges_iterator;

@@ -1,7 +1,9 @@
-use crate::order::Order;
-use crate::Range;
+use crate::range::Range;
+use order::Order;
 use std::fmt::Display;
 use std::ops::{Add, Sub};
+
+mod order;
 
 #[derive(Debug)]
 pub struct RangesIterator<T>
