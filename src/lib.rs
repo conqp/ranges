@@ -82,10 +82,25 @@ where
     }
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 enum Order {
     Ascending,
     Descending,
+}
+
+impl Order {
+    pub fn new<T>(start: T, next: T) -> Option<Self>
+    where
+        T: PartialEq + Add<T, Output = T> + Copy + Sub<T, Output = T> + From<u8>,
+    {
+        if next == start + 1.into() {
+            Some(Self::Ascending)
+        } else if next == start - 1.into() {
+            Some(Self::Descending)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -95,19 +110,16 @@ where
 {
     numbers: T,
     start: Option<T::Item>,
-    one: T::Item,
 }
 
 impl<T> RangesIterator<T>
 where
     T: Iterator,
-    T::Item: From<u8>,
 {
     pub fn new(numbers: T) -> Self {
         Self {
             numbers,
             start: None,
-            one: 1.into(),
         }
     }
 }
@@ -119,7 +131,8 @@ where
         + Copy
         + Display
         + Sub<T::Item, Output = T::Item>
-        + PartialEq,
+        + PartialEq
+        + From<u8>,
 {
     type Item = Range<T::Item>;
 
@@ -136,27 +149,25 @@ where
                     let last = end.unwrap_or(start);
 
                     match &order {
-                        None => {
-                            if next == last + self.one {
+                        None => match Order::new(last, next) {
+                            Some(new_order) => {
+                                order = Some(new_order);
                                 end = Some(next);
-                                order = Some(Order::Ascending);
-                            } else if next == last - self.one {
-                                end = Some(next);
-                                order = Some(Order::Descending);
-                            } else {
+                            }
+                            None => {
                                 self.start = Some(next);
                                 return Some(Range::new(start, last));
                             }
-                        }
-                        Some(order) => {
-                            if (order == &Order::Ascending && next == last + self.one)
-                                || (order == &Order::Descending && next == last - self.one)
-                            {
-                                end = Some(next)
-                            } else {
-                                self.start = Some(next);
-                                return Some(Range::new(start, last));
+                        },
+                        Some(current_order) => {
+                            if let Some(new_order) = Order::new(last, next) {
+                                if &new_order == current_order {
+                                    end = Some(next);
+                                    continue;
+                                }
                             }
+                            self.start = Some(next);
+                            return Some(Range::new(start, last));
                         }
                     }
                 }
@@ -166,13 +177,13 @@ where
         if let Some(start) = self.start {
             self.start = None;
 
-            return match end {
+            match end {
                 None => Some(Range::new(start, start)),
                 Some(end) => Some(Range::new(start, end)),
-            };
+            }
+        } else {
+            None
         }
-
-        None
     }
 }
 
