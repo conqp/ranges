@@ -10,7 +10,8 @@ fn main() {
     read_integers::<i64>().ranges().for_each(|range| {
         write!(stdout, "{separator}{range}").expect("Could not write to STDOUT.");
         separator = " ";
-    })
+    });
+    println!();
 }
 
 fn read_integers<T>() -> impl Iterator<Item = T>
