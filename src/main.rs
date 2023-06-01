@@ -3,15 +3,17 @@ use std::fmt::Debug;
 use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
 use std::str::FromStr;
 
+const ERROR_MESSAGE: &str = "Could not write to STDOUT.";
+
 fn main() {
     let mut stdout = BufWriter::new(stdout().lock());
     let mut separator = "";
 
     read_integers::<i64>().ranges().for_each(|range| {
-        write!(stdout, "{separator}{range}").expect("Could not write to STDOUT.");
+        write!(stdout, "{separator}{range}").expect(ERROR_MESSAGE);
         separator = " ";
     });
-    writeln!(stdout).expect("Could not write to STDOUT.");
+    writeln!(stdout).expect(ERROR_MESSAGE);
 }
 
 fn read_integers<T>() -> impl Iterator<Item = T>
