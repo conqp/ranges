@@ -29,9 +29,8 @@ where
 /// use ranges::Ranges;
 ///
 /// let sequence = vec![1, 2, 3, 6, 7, 9, 9, 9, 11, 20, 21, 22, 24, 23, 22];
-/// let ranges: Vec<_> = sequence.clone().ranges().collect();
 ///
-/// assert_eq!(sequence, ranges.into_iter().flatten().into_iter().collect::<Vec<_>>());
+/// assert_eq!(sequence, sequence.clone().ranges().flatten().into_iter().collect::<Vec<_>>());
 /// ```
 impl<T> IntoIterator for Range<T>
 where
