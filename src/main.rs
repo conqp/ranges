@@ -11,7 +11,7 @@ fn main() {
         write!(stdout, "{separator}{range}").expect("Could not write to STDOUT.");
         separator = " ";
     });
-    println!();
+    writeln!(stdout).expect("Could not write to STDOUT.");
 }
 
 fn read_integers<T>() -> impl Iterator<Item = T>
