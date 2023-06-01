@@ -20,14 +20,11 @@ where
 {
     BufReader::new(stdin().lock())
         .lines()
-        .take_while(|line| line.is_ok())
-        .map(|line| line.unwrap())
+        .map_while(|line| line.ok())
         .flat_map(|line| {
             line.split_ascii_whitespace()
                 .map(str::to_owned)
                 .collect::<Vec<_>>()
         })
-        .map(|number| number.parse::<T>())
-        .take_while(|result| result.is_ok())
-        .map(|result| result.unwrap())
+        .map_while(|number| number.parse::<T>().ok())
 }
