@@ -1,6 +1,6 @@
 use ranges::Ranges;
 use std::fmt::Debug;
-use std::io::{stdin, stdout, BufWriter, Write};
+use std::io::{stdin, stdout, BufRead, BufReader, BufWriter, Write};
 use std::str::FromStr;
 
 fn main() {
@@ -18,7 +18,7 @@ where
     T: FromStr,
     T::Err: Debug,
 {
-    stdin()
+    BufReader::new(stdin().lock())
         .lines()
         .take_while(|line| line.is_ok())
         .map(|line| line.unwrap())
