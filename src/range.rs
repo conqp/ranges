@@ -3,7 +3,7 @@ use std::fmt::{Display, Error, Formatter};
 use std::iter::Rev;
 use std::ops::{Add, Range as OpsRange, RangeInclusive};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Range<T>
 where
     T: Display + PartialEq,
@@ -16,7 +16,7 @@ impl<T> Range<T>
 where
     T: Display + PartialEq,
 {
-    pub fn new(start: T, end: T) -> Self {
+    pub const fn new(start: T, end: T) -> Self {
         Self { start, end }
     }
 }

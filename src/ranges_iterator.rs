@@ -18,7 +18,7 @@ impl<T> RangesIterator<T>
 where
     T: Iterator,
 {
-    pub fn new(numbers: T) -> Self {
+    pub const fn new(numbers: T) -> Self {
         Self {
             numbers,
             start: None,
@@ -51,16 +51,15 @@ where
                     let last = end.unwrap_or(start);
 
                     match &order {
-                        None => match Order::new(last, next) {
-                            Some(new_order) => {
+                        None => {
+                            if let Some(new_order) = Order::new(last, next) {
                                 order = Some(new_order);
                                 end = Some(next);
-                            }
-                            None => {
+                            } else {
                                 self.start = Some(next);
                                 return Some(Range::new(start, last));
                             }
-                        },
+                        }
                         Some(order) => {
                             if let Some(new_order) = &Order::new(last, next) {
                                 if new_order == order {
@@ -78,11 +77,10 @@ where
 
         if let Some(start) = self.start {
             self.start = None;
-
-            match end {
-                None => Some(Range::new(start, start)),
-                Some(end) => Some(Range::new(start, end)),
-            }
+            end.map_or_else(
+                || Some(Range::new(start, start)),
+                |end| Some(Range::new(start, end)),
+            )
         } else {
             None
         }

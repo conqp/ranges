@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub};
 
 #[derive(Debug, Eq, PartialEq)]
-pub(crate) enum Order {
+pub enum Order {
     Ascending,
     Descending,
 }

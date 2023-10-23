@@ -23,7 +23,7 @@ where
 {
     BufReader::new(stdin().lock())
         .lines()
-        .map_while(|line| line.ok())
+        .map_while(Result::ok)
         .flat_map(|line| {
             line.split_ascii_whitespace()
                 .map(str::to_owned)
