@@ -1,4 +1,5 @@
 use crate::range::Range;
+use num_traits::One;
 use order::Order;
 use std::fmt::Display;
 use std::ops::{Add, Sub};
@@ -32,7 +33,7 @@ where
     T::Item: Add<T::Item, Output = T::Item>
         + Copy
         + Display
-        + From<u8>
+        + One
         + PartialEq
         + Sub<T::Item, Output = T::Item>,
 {
@@ -90,7 +91,7 @@ where
 impl<T> From<T> for RangesIterator<T>
 where
     T: Iterator,
-    T::Item: From<u8>,
+    T::Item: One,
 {
     fn from(value: T) -> Self {
         Self::new(value)

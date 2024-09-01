@@ -1,4 +1,5 @@
 use crate::ranges_iterator::RangesIterator;
+use num_traits::One;
 
 /// Generate ranges from integer sequences
 ///
@@ -26,7 +27,7 @@ where
 impl<T> Ranges<T::IntoIter> for T
 where
     T: IntoIterator,
-    T::Item: From<u8>,
+    <T as IntoIterator>::Item: One,
 {
     fn ranges(self) -> RangesIterator<T::IntoIter> {
         self.into_iter().into()

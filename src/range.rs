@@ -1,4 +1,5 @@
 use either::{Either, Left, Right};
+use num_traits::One;
 use std::fmt::{Display, Error, Formatter};
 use std::iter::Rev;
 use std::ops::{Add, Range as OpsRange, RangeInclusive};
@@ -73,9 +74,9 @@ where
 
 impl<T> From<OpsRange<T>> for Range<T>
 where
-    T: Add<T, Output = T> + Display + From<u8> + PartialEq,
+    T: Add<T, Output = T> + Display + One + PartialEq,
 {
     fn from(value: OpsRange<T>) -> Self {
-        Self::new(value.start, value.end + 1.into())
+        Self::new(value.start, value.end + T::one())
     }
 }
